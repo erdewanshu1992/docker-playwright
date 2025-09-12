@@ -1,0 +1,30 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log
+
+# Build output
+dist/
+build/
+
+# Playwright artifacts
+test-results/
+playwright-report/
+videos/
+traces/
+screenshots/
+
+# TypeScript
+*.tsbuildinfo
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local

@@ -1,0 +1,13 @@
+node_modules
+test-results
+playwright-report
+.vscode
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
+.env
+npm-debug.log
+yarn-error.log
+dist
+coverage

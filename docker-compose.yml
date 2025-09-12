@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  playwright:
+    build: .
+    image: playwright-ts-framework:latest
+    # Non-interactive service for CI / headless runs
+    tty: true
+    environment:
+      # override BASE_URL at runtime if needed
+      - BASE_URL=${BASE_URL:-https://www.flipkart.com}
+      - CI=true
+    volumes:
+      - ./:/app:cached
+    # Increase shared memory to help browser stability
+    shm_size: 1gb
+    # Default command runs the test suite; override with `docker-compose run playwright <cmd>`
+    command: ["npm", "run", "test"]
+
+  # Optional debug service for headed runs using host X11 (Linux) or an X server.
+  # This service mounts the X11 socket so browsers can be displayed on the host.
+  # On macOS/Windows you'll need an X server (e.g., XQuartz or VcXsrv) and extra setup.
+  playwright-debug:
+    build: .
+    image: playwright-ts-framework:debug
+    tty: true
+    environment:
+      - BASE_URL=${BASE_URL:-https://www.flipkart.com}
+      - CI=false
+      # Allow override of DISPLAY from host environment
+      - DISPLAY=${DISPLAY:-:0}
+    volumes:
+      - ./:/app:cached
+      # mount the host X11 socket (Linux). Requires `xhost +local:root` on the host.
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    shm_size: 1gb
+    # Use the headed test script; override at runtime to run specific commands
+    command: ["npm", "run", "test:headed"]
+    # If you run browsers inside this container and face permissions issues, you may need:
+    #   docker-compose run --service-ports --user "$(id -u):$(id -g)" playwright-debug
+    # or run `xhost +local:root` on the host (security tradeoff).
