@@ -23,6 +23,8 @@ services:
   # This service mounts the X11 socket so browsers can be displayed on the host.
   # On macOS/Windows you'll need an X server (e.g., XQuartz or VcXsrv) and extra setup.
   playwright-debug:
+    # Only start the debug service when explicitly requested via --profile debug
+    profiles: ['debug']
     build: .
     image: playwright-ts-framework:debug
     tty: true
