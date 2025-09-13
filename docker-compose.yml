@@ -2,6 +2,9 @@ version: '3.8'
 
 services:
   playwright:
+  # Only start the debug service when explicitly requested via --profile debug
+  # profiles: ['debug']
+  
     build: .
     image: playwright-ts-framework:latest
     # Non-interactive service for CI / headless runs
