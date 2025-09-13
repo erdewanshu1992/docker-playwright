@@ -97,12 +97,16 @@ export default class HomePage extends BasePage {
   /**
    * Perform a search using the site's search input and wait for results.
    * Uses BasePage.waitForElementVisible + fillInputByKeyBoardType to satisfy the helper usage request.
+   * Updated to explicitly target the first matching input and be resilient to multiple inputs on the page.
    */
   async search(term: string) {
-    const input = this.searchInput();
-    if ((await input.count()) === 0) {
+    const inputs = this.searchInput();
+    if ((await inputs.count()) === 0) {
       throw new Error('Search input not found on HomePage');
     }
+
+    // Use the first matching input to avoid strict-mode ambiguity
+    const input = inputs.first();
 
     // Ensure input is visible and focused before typing
     await this.waitForElementVisible(input);
