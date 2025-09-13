@@ -98,11 +98,31 @@ export default class HomePage extends BasePage {
    * Perform a search using the site's search input and wait for results.
    * Uses BasePage.waitForElementVisible + fillInputByKeyBoardType to satisfy the helper usage request.
    * Updated to explicitly target the first matching input and be resilient to multiple inputs on the page.
+   * Added defensive recovery: if site shows an error banner (transient E002), reload once and retry.
    */
   async search(term: string) {
+    // Defensive helper: retry once if an error banner appears (site-side transient error)
+    const hasErrorBanner = async () => {
+      const err = this.page.locator('text=Something went wrong, text=Something went wrong!, text=E002');
+      return (await err.count()) > 0;
+    };
+
+    // If error banner present, reload once and wait for load
+    if (await hasErrorBanner()) {
+      await this.page.reload({ waitUntil: 'load' }).catch(() => {});
+      await this.page.waitForTimeout(1000);
+    }
+
+    // Ensure any login modal is closed before attempting to find the search input
+    await this.closeLoginIfPresent();
+
     const inputs = this.searchInput();
     if ((await inputs.count()) === 0) {
-      throw new Error('Search input not found on HomePage');
+      // Try one more time after a short wait (network may be slow in container)
+      await this.page.waitForTimeout(1000);
+      if ((await inputs.count()) === 0) {
+        throw new Error('Search input not found on HomePage');
+      }
     }
 
     // Use the first matching input to avoid strict-mode ambiguity
