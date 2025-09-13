@@ -8,7 +8,7 @@ function normalizePrice(p?: string | null) {
 
 test.describe('Flipkart smoke', () => {
   test('should load flipkart.com and validate brand', async ({ page }) => {
-    const home = new HomePage(page, 'https://www.flipkart.com');
+    const home = new HomePage(page, process.env.BASE_URL || 'https://www.flipkart.com');
     await home.goto('/');
     // close login modal if present
     const closeLogin = page.locator('button._2KpZ6l._2doB4z');
@@ -18,7 +18,7 @@ test.describe('Flipkart smoke', () => {
   });
 
   test('search item, open in new tab, add to cart and verify price', async ({ page }) => {
-    const home = new HomePage(page, 'https://www.flipkart.com');
+    const home = new HomePage(page, process.env.BASE_URL || 'https://www.flipkart.com');
     await home.goto('/');
     // close login modal if present
     const closeLogin = page.locator('button._2KpZ6l._2doB4z');
@@ -49,10 +49,10 @@ test.describe('Flipkart smoke', () => {
       if ((await buyNow.count()) > 0) {
         await buyNow.first().click();
         // on buy now, user may be redirected to checkout; navigate to cart to verify
-        await productPage.goto('https://www.flipkart.com/cart');
+        await productPage.goto((process.env.BASE_URL || 'https://www.flipkart.com') + '/cart');
       } else {
         // try clicking cart icon in header
-        await productPage.goto('https://www.flipkart.com/cart');
+        await productPage.goto((process.env.BASE_URL || 'https://www.flipkart.com') + '/cart');
       }
     }
 

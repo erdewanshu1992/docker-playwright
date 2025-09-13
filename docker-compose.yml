@@ -6,8 +6,10 @@ services:
     image: playwright-ts-framework:latest
     # Non-interactive service for CI / headless runs
     tty: true
+    env_file:
+      - .env
     environment:
-      # override BASE_URL at runtime if needed
+      # fallback override if not present in .env
       - BASE_URL=${BASE_URL:-https://www.flipkart.com}
       - CI=true
     volumes:
