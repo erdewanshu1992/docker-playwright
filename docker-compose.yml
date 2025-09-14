@@ -2,12 +2,17 @@ version: '3.8'
 
 services:
   playwright:
+  # Only start the debug service when explicitly requested via --profile debug
+  # profiles: ['debug']
+  
     build: .
     image: playwright-ts-framework:latest
     # Non-interactive service for CI / headless runs
     tty: true
+    env_file:
+      - .env
     environment:
-      # override BASE_URL at runtime if needed
+      # fallback override if not present in .env
       - BASE_URL=${BASE_URL:-https://www.flipkart.com}
       - CI=true
     volumes:
@@ -21,6 +26,8 @@ services:
   # This service mounts the X11 socket so browsers can be displayed on the host.
   # On macOS/Windows you'll need an X server (e.g., XQuartz or VcXsrv) and extra setup.
   playwright-debug:
+    # Only start the debug service when explicitly requested via --profile debug
+    profiles: ['debug']
     build: .
     image: playwright-ts-framework:debug
     tty: true
