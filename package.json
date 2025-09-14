@@ -13,7 +13,13 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky install",
-    "ci": "npx playwright install --with-deps && npm run test"
+    "ci": "npx playwright install --with-deps && npm run test",
+    "env:stage": "node ./scripts/switch-env.js stage",
+    "env:uat": "node ./scripts/switch-env.js uat",
+    "env:prod": "node ./scripts/switch-env.js prod",
+    "dc:stage": "docker-compose --env-file ./envs/.env.stage up --build --abort-on-container-exit --exit-code-from playwright",
+    "dc:uat": "docker-compose --env-file ./envs/.env.uat up --build --abort-on-container-exit --exit-code-from playwright",
+    "dc:prod": "docker-compose --env-file ./envs/.env.prod up --build --abort-on-container-exit --exit-code-from playwright"
   },
   "devDependencies": {
     "@playwright/test": "^1.42.0",
