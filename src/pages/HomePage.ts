@@ -116,10 +116,32 @@ export default class HomePage extends BasePage {
     // Ensure any login modal is closed before attempting to find the search input
     await this.closeLoginIfPresent();
 
-    const inputs = this.searchInput();
+    // Attempt to find the search input using the primary locator, then progressively broader fallbacks.
+    let inputs = this.searchInput();
     if ((await inputs.count()) === 0) {
       // Try one more time after a short wait (network may be slow in container)
       await this.page.waitForTimeout(1000);
+      inputs = this.searchInput();
+
+      // If still not found, probe several common fallback selectors used for search inputs across sites.
+      if ((await inputs.count()) === 0) {
+        const fallbackSelectors = [
+          'input[role="search"]',
+          'input[aria-label*="search"]',
+          'input[placeholder*="Search"]',
+          'input[type="search"]',
+          'input' // last resort: any input on the page
+        ];
+        for (const sel of fallbackSelectors) {
+          const candidate = this.page.locator(sel);
+          if ((await candidate.count()) > 0) {
+            inputs = candidate;
+            break;
+          }
+        }
+      }
+
+      // Final check: if still nothing, throw an informative error.
       if ((await inputs.count()) === 0) {
         throw new Error('Search input not found on HomePage');
       }
